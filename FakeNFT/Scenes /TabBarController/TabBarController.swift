@@ -4,22 +4,43 @@ final class TabBarController: UITabBarController {
 
     var servicesAssembly: ServicesAssembly!
 
-    private let catalogTabBarItem = UITabBarItem(
-        title: NSLocalizedString("Tab.catalog", comment: ""),
-        image: UIImage(systemName: "square.stack.3d.up.fill"),
-        tag: 0
-    )
-
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        let catalogController = TestCatalogViewController(
-            servicesAssembly: servicesAssembly
-        )
-        catalogController.tabBarItem = catalogTabBarItem
-
-        viewControllers = [catalogController]
-
-        view.backgroundColor = .systemBackground
+        setupAppearance()
+        setupTabs()
     }
+    
+    private func setupTabs() {
+            let catalogVC = CatalogAssembly.assemble()
+            let catalogNav = UINavigationController(rootViewController: catalogVC)
+            
+            catalogNav.tabBarItem = UITabBarItem(
+                title: "Каталог",
+                image: UIImage(named: "tab_catalog"),
+                selectedImage: nil
+            )
+            
+            viewControllers = [catalogNav]
+        }
+    
+    private func setupAppearance() {
+            let appearance = UITabBarAppearance()
+            
+            appearance.configureWithTransparentBackground()
+            appearance.backgroundColor = .white
+            appearance.shadowColor = nil
+        
+            let normalAttributes: [NSAttributedString.Key: Any] = [
+                .font: UIFont.systemFont(ofSize: 10, weight: .medium),
+                .foregroundColor: UIColor.black
+            ]
+            
+            appearance.stackedLayoutAppearance.normal.titleTextAttributes = normalAttributes
+            appearance.stackedLayoutAppearance.selected.titleTextAttributes = normalAttributes
+            
+            tabBar.standardAppearance = appearance
+            if #available(iOS 15.0, *) {
+                tabBar.scrollEdgeAppearance = appearance
+            }
+        }
 }

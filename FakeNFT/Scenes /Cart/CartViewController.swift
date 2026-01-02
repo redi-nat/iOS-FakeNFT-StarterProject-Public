@@ -7,6 +7,7 @@ final class CartViewController: UIViewController {
     // MARK: - Properties
     
     private let presenter: CartPresenter
+    private let servicesAssembly: ServicesAssembly
     private var cartItems: [CartNFTCellModel] = []
     
     // MARK: - UI Elements
@@ -59,8 +60,9 @@ final class CartViewController: UIViewController {
     
     // MARK: - Init
     
-    init(presenter: CartPresenter) {
+    init(presenter: CartPresenter, servicesAssembly: ServicesAssembly) {
         self.presenter = presenter
+        self.servicesAssembly = servicesAssembly
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -178,13 +180,46 @@ final class CartViewController: UIViewController {
     
     @objc
     private func sortButtonTapped() {
-        // TODO: Реализовать открытие меню сортировки (задача 2.5)
-        print("Sort button tapped")
+        let alertController = UIAlertController(
+            title: NSLocalizedString("Cart.Sort.Title", comment: "Сортировка"),
+            message: nil,
+            preferredStyle: .actionSheet
+        )
+        
+        // Добавляем варианты сортировки в нужном порядке: По цене, По рейтингу, По названию
+        let sortOptions: [CartSortOption] = [.price, .rating, .name]
+        for option in sortOptions {
+            let action = UIAlertAction(title: option.displayName, style: .default) { [weak self] _ in
+                self?.presenter.changeSortOption(option)
+            }
+            alertController.addAction(action)
+        }
+        
+        // Добавляем кнопку закрытия отдельно (стиль .cancel - будет отдельно внизу)
+        let closeAction = UIAlertAction(
+            title: NSLocalizedString("Cart.Sort.Cancel", comment: "Закрыть"),
+            style: .cancel
+        )
+        alertController.addAction(closeAction)
+        
+        // Для iPad нужно указать источник для popover
+        if let popover = alertController.popoverPresentationController {
+            popover.sourceView = sortButton
+            popover.sourceRect = sortButton.bounds
+            popover.permittedArrowDirections = .up
+        }
+        
+        present(alertController, animated: true)
     }
     
     private func payButtonTapped() {
-        // TODO: Реализовать переход на экран выбора валюты (задача 2.8)
-        print("Pay button tapped")
+        let orderId = presenter.getOrderId()
+        let currencySelectionAssembly = CurrencySelectionAssembly(servicesAssembly: servicesAssembly)
+        let currencySelectionVC = currencySelectionAssembly.build(orderId: orderId)
+        // Скрываем tab bar на экране оплаты
+        currencySelectionVC.hidesBottomBarWhenPushed = true
+        // Используем push вместо present для отдельного экрана
+        navigationController?.pushViewController(currencySelectionVC, animated: true)
     }
 }
 
@@ -200,9 +235,22 @@ extension CartViewController: UITableViewDataSource {
         let item = cartItems[indexPath.row]
         cell.configure(with: item)
         cell.onDelete = { [weak self] in
-            self?.presenter.deleteNFT(id: item.id)
+            self?.showDeleteConfirmation(for: item)
         }
         return cell
+    }
+    
+    private func showDeleteConfirmation(for item: CartNFTCellModel) {
+        let deleteConfirmationVC = DeleteConfirmationViewController(
+            nftModel: item,
+            onConfirm: { [weak self] in
+                self?.presenter.deleteNFT(id: item.id)
+            },
+            onCancel: {
+                // Ничего не делаем при отмене
+            }
+        )
+        present(deleteConfirmationVC, animated: true)
     }
 }
 

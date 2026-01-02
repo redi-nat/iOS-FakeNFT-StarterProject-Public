@@ -5,6 +5,8 @@ import Foundation
 protocol CartPresenter {
     func viewDidLoad()
     func deleteNFT(id: String)
+    func changeSortOption(_ option: CartSortOption)
+    func getOrderId() -> String
 }
 
 // MARK: - State
@@ -25,6 +27,9 @@ final class CartPresenterImpl: CartPresenter {
     
     weak var view: CartView?
     private let cartService: CartService
+    private var currentNFTs: [CartNFT] = []
+    private var currentOrderId: String = "1" // По умолчанию "1", можно получить из заказа
+    private var sortOption: CartSortOption = CartSortUtility.loadSortOption()
     private var state = CartState.initial {
         didSet {
             stateDidChanged()
@@ -40,7 +45,20 @@ final class CartPresenterImpl: CartPresenter {
     // MARK: - Functions
     
     func viewDidLoad() {
+        // Загружаем сохраненную сортировку
+        sortOption = CartSortUtility.loadSortOption()
         state = .loading
+    }
+    
+    func changeSortOption(_ option: CartSortOption) {
+        sortOption = option
+        CartSortUtility.saveSortOption(option)
+        // Применяем сортировку к текущим данным
+        applySorting()
+    }
+    
+    func getOrderId() -> String {
+        return currentOrderId
     }
     
     func deleteNFT(id: String) {
@@ -71,15 +89,14 @@ final class CartPresenterImpl: CartPresenter {
             view?.showLoading()
             loadCart()
         case .data(let nfts):
-            // Скрываем loading перед обновлением данных
-            view?.hideLoading()
-            let count = nfts.count
-            let total = nfts.reduce(0.0) { $0 + $1.price }
-            view?.displayNFTs(nfts)
-            view?.updateSummary(count: count, total: total)
+            // Сохраняем текущие NFT
+            currentNFTs = nfts
+            // Применяем сортировку
+            applySorting()
         case .empty:
             // Скрываем loading перед обновлением данных
             view?.hideLoading()
+            currentNFTs = []
             view?.displayNFTs([])
             view?.updateSummary(count: 0, total: 0)
         case .failed(let error):
@@ -94,6 +111,7 @@ final class CartPresenterImpl: CartPresenter {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let order):
+                    self?.currentOrderId = order.id
                     if order.nfts.isEmpty {
                         self?.state = .empty
                     } else {
@@ -104,6 +122,16 @@ final class CartPresenterImpl: CartPresenter {
                 }
             }
         }
+    }
+    
+    private func applySorting() {
+        let sortedNFTs = CartSortUtility.sort(currentNFTs, by: sortOption)
+        // Скрываем loading перед обновлением данных
+        view?.hideLoading()
+        let count = sortedNFTs.count
+        let total = sortedNFTs.reduce(0.0) { $0 + $1.price }
+        view?.displayNFTs(sortedNFTs)
+        view?.updateSummary(count: count, total: total)
     }
     
     private func makeErrorModel(_ error: Error) -> ErrorModel {

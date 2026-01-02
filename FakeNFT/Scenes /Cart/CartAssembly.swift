@@ -13,7 +13,7 @@ final class CartAssembly {
         let presenter = CartPresenterImpl(
             cartService: servicesAssembly.cartService
         )
-        let viewController = CartViewController(presenter: presenter)
+        let viewController = CartViewController(presenter: presenter, servicesAssembly: servicesAssembly)
         presenter.view = viewController
         return viewController
     }

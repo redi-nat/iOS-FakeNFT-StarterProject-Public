@@ -120,6 +120,7 @@ struct DefaultNetworkClient: NetworkClient {
 
         urlRequest.addValue(RequestConstants.token, forHTTPHeaderField: "X-Practicum-Mobile-Token")
 
+        // Устанавливаем Content-Type только если есть тело запроса (dto)
         if let dtoDictionary = request.dto?.asDictionary() {
             var urlComponents = URLComponents()
             let queryItems = dtoDictionary.map { field in
@@ -130,10 +131,11 @@ struct DefaultNetworkClient: NetworkClient {
             }
             urlComponents.queryItems = queryItems
             urlRequest.httpBody = urlComponents.query?.data(using: .utf8)
-            urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            
+            // Для PUT и POST запросов используем application/x-www-form-urlencoded
+            // согласно документации API FakeNFT
+            urlRequest.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         }
-
-        urlRequest.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
 
         return urlRequest
     }

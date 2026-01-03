@@ -10,10 +10,16 @@ struct UsersRequest: NetworkRequest {
     }
     
     var endpoint: URL? {
-    
-        let urlString = "\(RequestConstants.baseURL)/api/v1/users?page=\(page)&size=\(size)"
-        print("🌐 URL запроса: \(urlString)")
-        return URL(string: urlString)
+        var components = URLComponents(string: RequestConstants.baseURL + "/api/v1/users")
+        components?.queryItems = [
+            URLQueryItem(name: "page", value: "\(page)"),
+            URLQueryItem(name: "size", value: "\(size)")
+        ]
+        
+        let url = components?.url
+        print("🌐 URL запроса: \(url?.absoluteString ?? "nil")")
+        
+        return url
     }
     
     var dto: Dto? {
@@ -25,7 +31,10 @@ struct UserRequest: NetworkRequest {
     let id: String
     
     var endpoint: URL? {
-        URL(string: "\(RequestConstants.baseURL)/api/v1/users/\(id)")
+        var components = URLComponents(string: RequestConstants.baseURL)
+        components?.path = "/api/v1/users/\(id)"
+        
+        return components?.url
     }
     
     var dto: Dto? {

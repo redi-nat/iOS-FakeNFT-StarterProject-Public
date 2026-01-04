@@ -3,6 +3,14 @@ import UIKit
 final class StatisticViewController: UIViewController {
     
     // MARK: - UI Components
+    private lazy var refreshControl: UIRefreshControl = {
+        let refresh = UIRefreshControl()
+        refresh.addTarget(self,
+                          action: #selector(refreshData)
+                          , for: .valueChanged)
+        refresh.tintColor = .gray
+        return refresh
+    }()
     
     private lazy var navigationBar: UINavigationBar = {
         let navBar = UINavigationBar()
@@ -91,12 +99,17 @@ final class StatisticViewController: UIViewController {
             activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
+        tableView.refreshControl = refreshControl
     }
     
     // MARK: - Actions
     @objc private func sortButtonTapped() {
         let currentSort = presenter.currentSortType
         showSortOptions(currentSort: currentSort)
+    }
+    
+    @objc private func refreshData() {
+        presenter.didPullToRefresh()
     }
 }
 
@@ -132,6 +145,7 @@ extension StatisticViewController: StatisticViewProtocol {
     
     func hideLoading() {
         activityIndicator.stopAnimating()
+        refreshControl.endRefreshing()
     }
     
     func reloadData() {

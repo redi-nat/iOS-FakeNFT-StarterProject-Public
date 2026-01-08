@@ -305,6 +305,14 @@ extension CartViewController: CartView {
         tableView.isHidden = isEmpty
         summaryView.isHidden = isEmpty // Показываем панель оплаты только если корзина не пустая
         
+        // Скрываем/показываем кнопку фильтра в зависимости от состояния корзины
+        if isEmpty {
+            navigationItem.rightBarButtonItem = nil
+        } else {
+            let sortBarButton = UIBarButtonItem(customView: sortButton)
+            navigationItem.rightBarButtonItem = sortBarButton
+        }
+        
         tableView.reloadData()
     }
     

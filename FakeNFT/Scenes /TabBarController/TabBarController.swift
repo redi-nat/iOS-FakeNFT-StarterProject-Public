@@ -26,9 +26,12 @@ final class TabBarController: UITabBarController {
         
         let statisticAssembly = StatisticAssembly(servicesAssembly: servicesAssembly)
         let statisticController = statisticAssembly.assemble()
-        statisticController.tabBarItem = statisticTabBarItem
         
-        viewControllers = [catalogController, statisticController]
+        let statisticNavController = UINavigationController(rootViewController: statisticController)
+        statisticNavController.tabBarItem = statisticTabBarItem
+        statisticNavController.navigationBar.prefersLargeTitles = false
+        
+        viewControllers = [catalogController, statisticNavController]
         
         view.backgroundColor = .systemBackground
         tabBar.tintColor = UIColor(red: 0.0, green: 0.48, blue: 1.0, alpha: 1.0)

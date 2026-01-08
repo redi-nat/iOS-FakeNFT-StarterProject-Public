@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -125,6 +125,11 @@
 		E1CD40DB2A96BECC00BE7FE8 /* Localizable.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = Localizable.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		2742B2002F0C37E400E59203 /* UserCard */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = UserCard; sourceTree = "<group>"; };
+		2742B20C2F0E8C7D00E59203 /* WebView */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = WebView; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
 		3F68069029CBBAF100B4F915 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
@@ -167,6 +172,7 @@
 		0CF2C2D92A783C1600FDC837 /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				2742B20C2F0E8C7D00E59203 /* WebView */,
 				0CF2C2DF2A784C5600FDC837 /* Views */,
 				0CF2C2DE2A784C4C00FDC837 /* Protocols */,
 			);
@@ -209,6 +215,7 @@
 		27473F292EFD53B60082D089 /* Statistics */ = {
 			isa = PBXGroup;
 			children = (
+				2742B2002F0C37E400E59203 /* UserCard */,
 				2742B1FE2EFDB59600E59203 /* StatisticTableViewCell.swift */,
 				2742B1FC2EFDB31C00E59203 /* StatisticPresenter.swift */,
 				2742B1FA2EFDB2A000E59203 /* StatisticAssembly.swift */,
@@ -404,6 +411,10 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				2742B2002F0C37E400E59203 /* UserCard */,
+				2742B20C2F0E8C7D00E59203 /* WebView */,
 			);
 			name = FakeNFT;
 			packageProductDependencies = (

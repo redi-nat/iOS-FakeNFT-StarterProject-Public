@@ -12,7 +12,10 @@ final class StatisticAssembly {
     func assemble() -> StatisticViewController {
         let usersService = servicesAssembly.usersService
         let presenter = StatisticPresenter(usersService: usersService)
-        let viewController = StatisticViewController(presenter: presenter)
+        
+        let viewController = StatisticViewController(presenter: presenter,
+        servicesAssembly: servicesAssembly)
+        
         presenter.view = viewController
         
         return viewController

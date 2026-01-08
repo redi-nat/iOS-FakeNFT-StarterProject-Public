@@ -3,6 +3,10 @@ import UIKit
 /// Экран успешной оплаты
 final class PaymentSuccessViewController: UIViewController {
     
+    // MARK: - Properties
+    
+    private let cartService: CartService
+    
     // MARK: - UI Elements
     
     private lazy var successImageView: UIImageView = {
@@ -54,7 +58,8 @@ final class PaymentSuccessViewController: UIViewController {
     
     // MARK: - Init
     
-    init() {
+    init(cartService: CartService) {
+        self.cartService = cartService
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -79,21 +84,25 @@ final class PaymentSuccessViewController: UIViewController {
         view.addSubview(returnToCartButton)
         
         NSLayoutConstraint.activate([
-            // Success image - width: 278, height: 278, top: 196px, left: 49px
-            successImageView.topAnchor.constraint(equalTo: view.topAnchor, constant: 196),
-            successImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 49),
+            // Success image - width: 278, height: 278, отцентровано по горизонтали
+            successImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 196),
+            successImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             successImageView.widthAnchor.constraint(equalToConstant: 278),
             successImageView.heightAnchor.constraint(equalToConstant: 278),
             
-            // Success label - width: 303, height: 56 (минимум), top: 494px, left: 36px
-            successLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 494),
-            successLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 36),
-            successLabel.widthAnchor.constraint(equalToConstant: 303),
+            // Success label - отцентровано по горизонтали
+            successLabel.topAnchor.constraint(equalTo: successImageView.bottomAnchor, constant: 20),
+            successLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            successLabel.leadingAnchor.constraint(greaterThanOrEqualTo: view.leadingAnchor, constant: 36),
+            successLabel.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -36),
+            successLabel.widthAnchor.constraint(lessThanOrEqualToConstant: 303),
             successLabel.heightAnchor.constraint(greaterThanOrEqualToConstant: 56),
             
-            // Return to cart button - width: 343, height: 60, top: 702px, left: 16px
-            returnToCartButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 702),
-            returnToCartButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            // Return to cart button - отцентровано по горизонтали
+            returnToCartButton.topAnchor.constraint(equalTo: successLabel.bottomAnchor, constant: 137),
+            returnToCartButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            returnToCartButton.leadingAnchor.constraint(greaterThanOrEqualTo: view.leadingAnchor, constant: 16),
+            returnToCartButton.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -16),
             returnToCartButton.widthAnchor.constraint(equalToConstant: 343),
             returnToCartButton.heightAnchor.constraint(equalToConstant: 60)
         ])
@@ -103,13 +112,37 @@ final class PaymentSuccessViewController: UIViewController {
     
     @objc
     private func returnToCartTapped() {
-        // Закрываем все модальные экраны и возвращаемся в корзину
-        if let tabBarController = presentingViewController?.presentingViewController as? UITabBarController {
-            tabBarController.dismiss(animated: true) {
-                tabBarController.selectedIndex = 2 // Индекс вкладки корзины
+        // Очищаем корзину после успешной оплаты
+        cartService.clearCart { [weak self] _ in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                
+                // Находим TabBarController через window
+                guard let windowScene = self.view.window?.windowScene,
+                      let window = windowScene.windows.first,
+                      let tabBarController = window.rootViewController as? UITabBarController else {
+                    // Fallback: просто закрываем модальный экран
+                    self.dismiss(animated: true)
+                    return
+                }
+                
+                // Получаем navigationController корзины (индекс 2)
+                guard let cartNavigationController = tabBarController.viewControllers?[2] as? UINavigationController else {
+                    self.dismiss(animated: true)
+                    return
+                }
+                
+                // Закрываем модальный экран PaymentSuccessViewController
+                self.dismiss(animated: true) {
+                    // Переключаемся на вкладку корзины в TabBarController
+                    tabBarController.selectedIndex = 2
+                    
+                    // Возвращаемся к корню navigation stack корзины (CartViewController)
+                    // Это закроет CurrencySelectionViewController и вернет нас в корзину
+                    // viewWillAppear автоматически вызовет reloadCart() и обновит корзину
+                    cartNavigationController.popToRootViewController(animated: true)
+                }
             }
-        } else {
-            dismiss(animated: true)
         }
     }
 }

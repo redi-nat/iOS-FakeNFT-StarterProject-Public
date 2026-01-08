@@ -73,6 +73,7 @@
 		E1PAYMT02AA01CE401C3AFBC /* PaymentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1PAYMT02AA01CE400C3AFBC /* PaymentService.swift */; };
 		E1PAYMT02AA01CE410C3AFBC /* PaymentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1PAYMT02AA01CE400C3AFBC /* PaymentService.swift */; };
 		E1PROF012AA01CE400C3AFBC /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1PROF002AA01CE400C3AFBC /* ProfileViewController.swift */; };
+		427761DA373F44E6A496D5B71772BB2D /* ProfileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 427761DA373F44E6A496D5B71772BB2C /* ProfileService.swift */; };
 		E1STAT012AA01CE400C3AFBC /* StatisticsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1STAT002AA01CE400C3AFBC /* StatisticsViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -162,6 +163,7 @@
 		E1CURRY02AA01CE400C3AFBC /* CurrencyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyService.swift; sourceTree = "<group>"; };
 		E1DELT02AA01CE400C3AFBC /* DeleteConfirmationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteConfirmationViewController.swift; sourceTree = "<group>"; };
 		E1PAYMT02AA01CE400C3AFBC /* PaymentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentService.swift; sourceTree = "<group>"; };
+		427761DA373F44E6A496D5B71772BB2C /* ProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileService.swift; sourceTree = "<group>"; };
 		E1PROF002AA01CE400C3AFBC /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		E1STAT002AA01CE400C3AFBC /* StatisticsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -319,6 +321,7 @@
 				E1CART902AA01CE400C3AFBC /* CartService.swift */,
 				E1CURRY02AA01CE400C3AFBC /* CurrencyService.swift */,
 				E1PAYMT02AA01CE400C3AFBC /* PaymentService.swift */,
+				427761DA373F44E6A496D5B71772BB2C /* ProfileService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -658,6 +661,7 @@
 				E1CART902AA01CE410C3AFBC /* CartService.swift in Sources */,
 				E1CURRY02AA01CE410C3AFBC /* CurrencyService.swift in Sources */,
 				E1PAYMT02AA01CE410C3AFBC /* PaymentService.swift in Sources */,
+				427761DA373F44E6A496D5B71772BB2D /* ProfileService.swift in Sources */,
 				3F68069729CBBAF100B4F915 /* AppDelegate.swift in Sources */,
 				3F68069929CBBAF100B4F915 /* SceneDelegate.swift in Sources */,
 				0C79EE6C2A76DE2E00EE90EA /* ServicesAssemly.swift in Sources */,

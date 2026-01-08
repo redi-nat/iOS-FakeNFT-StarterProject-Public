@@ -24,6 +24,10 @@ final class ServicesAssembly {
     private lazy var _paymentService: PaymentService = {
         PaymentServiceImpl(networkClient: networkClient)
     }()
+    
+    private lazy var _profileService: ProfileService = {
+        ProfileServiceImpl(networkClient: networkClient, nftStorage: nftStorage)
+    }()
 
     init(
         networkClient: NetworkClient,
@@ -47,5 +51,9 @@ final class ServicesAssembly {
     
     var paymentService: PaymentService {
         _paymentService
+    }
+    
+    var profileService: ProfileService {
+        _profileService
     }
 }

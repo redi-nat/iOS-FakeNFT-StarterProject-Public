@@ -7,6 +7,8 @@ protocol CartPresenter {
     func deleteNFT(id: String)
     func changeSortOption(_ option: CartSortOption)
     func getOrderId() -> String
+    func reloadCart()
+    func getCurrentNFTs() -> [CartNFT]
 }
 
 // MARK: - State
@@ -59,6 +61,14 @@ final class CartPresenterImpl: CartPresenter {
     
     func getOrderId() -> String {
         return currentOrderId
+    }
+    
+    func reloadCart() {
+        state = .loading
+    }
+    
+    func getCurrentNFTs() -> [CartNFT] {
+        return currentNFTs
     }
     
     func deleteNFT(id: String) {

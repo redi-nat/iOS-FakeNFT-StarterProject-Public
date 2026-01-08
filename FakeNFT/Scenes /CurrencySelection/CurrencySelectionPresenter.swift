@@ -26,7 +26,10 @@ final class CurrencySelectionPresenterImpl: CurrencySelectionPresenter {
     weak var view: CurrencySelectionView?
     private let currencyService: CurrencyService
     private let paymentService: PaymentService
+    private let cartService: CartService
+    private let profileService: ProfileService
     private let orderId: String
+    private let purchasedNFTIds: [String] // Список ID NFT, которые будут отправлены в профиль после оплаты
     private var currencies: [Currency] = []
     private var selectedCurrencyIndex: Int?
     private var state = CurrencySelectionState.initial {
@@ -40,11 +43,17 @@ final class CurrencySelectionPresenterImpl: CurrencySelectionPresenter {
     init(
         currencyService: CurrencyService,
         paymentService: PaymentService,
-        orderId: String
+        cartService: CartService,
+        profileService: ProfileService,
+        orderId: String,
+        purchasedNFTIds: [String]
     ) {
         self.currencyService = currencyService
         self.paymentService = paymentService
+        self.cartService = cartService
+        self.profileService = profileService
         self.orderId = orderId
+        self.purchasedNFTIds = purchasedNFTIds
     }
     
     // MARK: - Functions
@@ -77,6 +86,8 @@ final class CurrencySelectionPresenterImpl: CurrencySelectionPresenter {
                 switch result {
                 case .success(let paymentResponse):
                     self.view?.hideLoading()
+                    // Отправляем купленные NFT в профиль
+                    self.sendNFTsToProfile()
                     // Переход на экран подтверждения оплаты
                     self.view?.showPaymentSuccess()
                 case .failure(let error):
@@ -176,10 +187,28 @@ final class CurrencySelectionPresenterImpl: CurrencySelectionPresenter {
                 self?.payButtonTapped()
             },
             cancelText: cancelActionText,
-            cancelAction: {
-                // При отмене ничего не делаем, просто закрываем алерт
+            cancelAction: { [weak self] in
+                // При отмене закрываем экран выбора валюты
+                self?.view?.dismissScreen()
             }
         )
+    }
+    
+    private func sendNFTsToProfile() {
+        // Отправляем купленные NFT в профиль (заглушка)
+        // TODO: Будет доработано при интеграции с профилем
+        guard !purchasedNFTIds.isEmpty else { return }
+        
+        profileService.addPurchasedNFTs(purchasedNFTIds) { result in
+            switch result {
+            case .success:
+                // NFT успешно добавлены в профиль
+                print("✅ NFT успешно отправлены в профиль: \(self.purchasedNFTIds)")
+            case .failure(let error):
+                // Ошибка при отправке в профиль (не критично для оплаты)
+                print("⚠️ Ошибка при отправке NFT в профиль: \(error)")
+            }
+        }
     }
 }
 

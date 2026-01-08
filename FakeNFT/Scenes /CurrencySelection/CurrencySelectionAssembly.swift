@@ -9,14 +9,20 @@ final class CurrencySelectionAssembly {
         self.servicesAssembly = servicesAssembly
     }
     
-    func build(orderId: String) -> CurrencySelectionViewController {
+    func build(orderId: String, purchasedNFTIds: [String]) -> CurrencySelectionViewController {
         let presenter = CurrencySelectionPresenterImpl(
             currencyService: servicesAssembly.currencyService,
             paymentService: servicesAssembly.paymentService,
-            orderId: orderId
+            cartService: servicesAssembly.cartService,
+            profileService: servicesAssembly.profileService,
+            orderId: orderId,
+            purchasedNFTIds: purchasedNFTIds
         )
         
-        let viewController = CurrencySelectionViewController(presenter: presenter)
+        let viewController = CurrencySelectionViewController(
+            presenter: presenter,
+            cartService: servicesAssembly.cartService
+        )
         presenter.view = viewController
         
         return viewController

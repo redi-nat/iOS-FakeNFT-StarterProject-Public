@@ -6,6 +6,7 @@ final class CurrencySelectionViewController: UIViewController {
     // MARK: - Properties
     
     private let presenter: CurrencySelectionPresenter
+    private let cartService: CartService
     private var currencies: [Currency] = []
     private var selectedIndex: Int?
     
@@ -128,8 +129,9 @@ final class CurrencySelectionViewController: UIViewController {
     
     // MARK: - Init
     
-    init(presenter: CurrencySelectionPresenter) {
+    init(presenter: CurrencySelectionPresenter, cartService: CartService) {
         self.presenter = presenter
+        self.cartService = cartService
         super.init(nibName: nil, bundle: nil)
         // Скрываем tab bar на экране оплаты
         hidesBottomBarWhenPushed = true
@@ -324,9 +326,13 @@ extension CurrencySelectionViewController: CurrencySelectionView {
     }
     
     func showPaymentSuccess() {
-        let successViewController = PaymentSuccessViewController()
+        let successViewController = PaymentSuccessViewController(cartService: cartService)
         successViewController.modalPresentationStyle = UIModalPresentationStyle.overFullScreen
         present(successViewController, animated: true)
+    }
+    
+    func dismissScreen() {
+        navigationController?.popViewController(animated: true)
     }
 }
 

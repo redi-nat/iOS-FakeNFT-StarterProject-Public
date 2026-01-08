@@ -109,7 +109,19 @@ final class CartViewController: UIViewController {
         setupNavigationBar()
         setupUI()
         view.backgroundColor = .systemBackground
+        
+        // Изначально скрываем все элементы, пока не загрузятся данные
+        tableView.isHidden = true
+        emptyStateLabel.isHidden = true
+        summaryView.isHidden = true
+        
         presenter.viewDidLoad()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        // Перезагружаем корзину при появлении экрана (например, после возврата из оплаты)
+        presenter.reloadCart()
     }
     
     // MARK: - Private Methods
@@ -137,11 +149,12 @@ final class CartViewController: UIViewController {
     
     private func setupUI() {
         // Сначала добавляем все view в иерархию
+        // Важно: loadingView должен быть добавлен последним, чтобы быть поверх всех элементов
         view.addSubview(tableView)
         view.addSubview(summaryView)
         view.addSubview(activityIndicator)
-        view.addSubview(loadingView)
         view.addSubview(emptyStateLabel)
+        view.addSubview(loadingView) // Добавляем последним, чтобы быть поверх всего
         
         // Настраиваем translatesAutoresizingMaskIntoConstraints
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -214,8 +227,9 @@ final class CartViewController: UIViewController {
     
     private func payButtonTapped() {
         let orderId = presenter.getOrderId()
+        let nftIds = presenter.getCurrentNFTs().map { $0.id } // Получаем список ID NFT из корзины
         let currencySelectionAssembly = CurrencySelectionAssembly(servicesAssembly: servicesAssembly)
-        let currencySelectionVC = currencySelectionAssembly.build(orderId: orderId)
+        let currencySelectionVC = currencySelectionAssembly.build(orderId: orderId, purchasedNFTIds: nftIds)
         // Скрываем tab bar на экране оплаты
         currencySelectionVC.hidesBottomBarWhenPushed = true
         // Используем push вместо present для отдельного экрана
@@ -301,8 +315,15 @@ extension CartViewController: CartView {
 
 extension CartViewController {
     func showLoading() {
+        // Скрываем все элементы во время загрузки
+        emptyStateLabel.isHidden = true
+        tableView.isHidden = true
+        summaryView.isHidden = true
+        // Убеждаемся, что loadingView поверх всего
+        view.bringSubviewToFront(loadingView)
+        // Показываем loadingView
         loadingView.startAnimating()
-        summaryView.isHidden = true // Скрываем панель оплаты во время загрузки
+        loadingView.isHidden = false
     }
     
     func hideLoading() {

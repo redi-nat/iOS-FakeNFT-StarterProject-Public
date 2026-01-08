@@ -10,5 +10,8 @@ protocol CurrencySelectionView: AnyObject, ErrorView, LoadingView {
     
     /// Показывает экран успешной оплаты
     func showPaymentSuccess()
+    
+    /// Закрывает экран выбора валюты
+    func dismissScreen()
 }
 

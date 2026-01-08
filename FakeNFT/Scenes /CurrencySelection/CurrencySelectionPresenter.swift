@@ -161,8 +161,9 @@ final class CurrencySelectionPresenterImpl: CurrencySelectionPresenter {
                 // При повторить ничего не делаем, просто закрываем
             },
             cancelText: cancelActionText,
-            cancelAction: {
-                // При отмене ничего не делаем, просто закрываем алерт
+            cancelAction: { [weak self] in
+                // При отмене закрываем экран выбора валюты
+                self?.view?.dismissScreen()
             }
         )
     }

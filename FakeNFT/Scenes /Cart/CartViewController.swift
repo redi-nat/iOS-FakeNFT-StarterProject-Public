@@ -114,6 +114,8 @@ final class CartViewController: UIViewController {
         tableView.isHidden = true
         emptyStateLabel.isHidden = true
         summaryView.isHidden = true
+        // Скрываем кнопку фильтра до начала загрузки
+        navigationItem.rightBarButtonItem = nil
         
         presenter.viewDidLoad()
     }
@@ -319,6 +321,8 @@ extension CartViewController {
         emptyStateLabel.isHidden = true
         tableView.isHidden = true
         summaryView.isHidden = true
+        // Скрываем кнопку фильтра во время загрузки
+        navigationItem.rightBarButtonItem = nil
         // Убеждаемся, что loadingView поверх всего
         view.bringSubviewToFront(loadingView)
         // Показываем loadingView
@@ -332,6 +336,9 @@ extension CartViewController {
         loadingView.isHidden = true
         // Принудительно обновляем layout, чтобы гарантировать скрытие
         view.layoutIfNeeded()
+        // Восстанавливаем кнопку фильтра после загрузки
+        let sortBarButton = UIBarButtonItem(customView: sortButton)
+        navigationItem.rightBarButtonItem = sortBarButton
         // Панель оплаты будет показана/скрыта в displayNFTs в зависимости от наличия товаров
     }
 }

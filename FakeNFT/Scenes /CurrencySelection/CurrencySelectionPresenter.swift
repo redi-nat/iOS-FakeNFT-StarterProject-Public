@@ -196,8 +196,7 @@ final class CurrencySelectionPresenterImpl: CurrencySelectionPresenter {
     }
     
     private func sendNFTsToProfile() {
-        // Отправляем купленные NFT в профиль (заглушка)
-        // TODO: Будет доработано при интеграции с профилем
+        // Отправляем купленные NFT в профиль
         guard !purchasedNFTIds.isEmpty else { return }
         
         profileService.addPurchasedNFTs(purchasedNFTIds) { result in

@@ -69,13 +69,13 @@ final class TabBarController: UITabBarController {
         )
         
         // Корзина - используем кастомную иконку из Assets
-        // Активная версия уже синяя в Assets (cartTabBar)
-        // Для неактивной используем ту же иконку, цвет будет применен через appearance
         // Встраиваем в Navigation Controller для отображения Navigation Bar
         let cartAssembly = CartAssembly(servicesAssembly: servicesAssembly)
         let cartController = cartAssembly.build()
         let cartNavigationController = UINavigationController(rootViewController: cartController)
-        let cartImage = UIImage(named: "cartTabBar")?.withRenderingMode(.alwaysTemplate)
+        // Пробуем загрузить кастомную иконку, если не получается - используем системную
+        let cartImage = UIImage(named: "cartTabBar")?.withRenderingMode(.alwaysTemplate) ?? 
+                        UIImage(systemName: "cart")?.withRenderingMode(.alwaysTemplate)
         cartNavigationController.tabBarItem = UITabBarItem(
             title: NSLocalizedString("Tab.cart", comment: ""),
             image: cartImage,

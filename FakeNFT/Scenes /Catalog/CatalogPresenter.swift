@@ -33,4 +33,14 @@ final class CatalogPresenter: CatalogPresenterProtocol {
         let selectedCollection = collections[indexPath.row]
         router.openCollectionDetail(collection: selectedCollection)
     }
+    
+    func sortByName() {
+        collections.sort { $0.name < $1.name }
+        view?.reloadTableView()
+    }
+
+    func sortByCount() {
+        collections.sort { $0.nfts.count > $1.nfts.count }
+        view?.reloadTableView()
+    }
 }

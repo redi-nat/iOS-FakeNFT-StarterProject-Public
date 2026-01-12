@@ -10,4 +10,6 @@ protocol CatalogPresenterProtocol {
     var collections: [CollectionModel] { get }
     func viewDidLoad()
     func didSelectCollection(at indexPath: IndexPath)
+    func sortByName()
+    func sortByCount()
 }

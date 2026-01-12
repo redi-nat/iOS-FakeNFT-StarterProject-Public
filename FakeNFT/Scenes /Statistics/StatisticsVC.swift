@@ -5,9 +5,7 @@ final class StatisticViewController: UIViewController {
     // MARK: - UI Components
     private lazy var refreshControl: UIRefreshControl = {
         let refresh = UIRefreshControl()
-        refresh.addTarget(self,
-                          action: #selector(refreshData)
-                          , for: .valueChanged)
+        refresh.addAction(UIAction { [weak self] _ in self?.refreshData () }, for: .valueChanged)
         refresh.tintColor = .gray
         return refresh
     }()
@@ -111,7 +109,7 @@ final class StatisticViewController: UIViewController {
         showSortOptions(currentSort: currentSort)
     }
     
-    @objc private func refreshData() {
+    private func refreshData() {
         presenter.didPullToRefresh()
     }
 }

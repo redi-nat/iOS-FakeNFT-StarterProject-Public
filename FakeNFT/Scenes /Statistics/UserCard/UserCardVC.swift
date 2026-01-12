@@ -55,7 +55,7 @@ final class UserCardVC: UIViewController {
         button.contentHorizontalAlignment = .center
         button.contentVerticalAlignment = .center
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(toUserWebsiteGo), for: .touchUpInside)
+        button.addAction(UIAction { [weak self] _ in self?.toUserWebsiteGo() }, for: .touchUpInside)
         return button
     }()
     
@@ -67,8 +67,7 @@ final class UserCardVC: UIViewController {
         button.contentHorizontalAlignment = .left
         button.contentVerticalAlignment = .center
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self,
-                         action: #selector(toUserCollectonNFTGo),
+        button.addAction(UIAction { [weak self] _ in self?.toUserCollectonNFTGo() },
                          for: .touchUpInside)
         return button
     }()
@@ -183,11 +182,11 @@ final class UserCardVC: UIViewController {
     }
     
     // Mark: – Actions
-    @objc private func toUserWebsiteGo() {
+    private func toUserWebsiteGo() {
         presenter.toUserWebsiteGo()
     }
     
-    @objc private func toUserCollectonNFTGo() {
+    private func toUserCollectonNFTGo() {
         presenter.toUserCollectonNFTGo()
     }
     

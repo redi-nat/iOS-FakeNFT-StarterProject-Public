@@ -30,12 +30,16 @@ final class UserCardPresenter: UserCardPresenterProtocol {
     
     func toUserWebsiteGo() {
         guard let user = user,
-              let url = URL(string: user.website) else {return}
+              let url = URL(string: user.website) else {
+            return
+        }
         onWebsiteTap?(url)
     }
     
     func toUserCollectonNFTGo() {
-        guard let user = user else {return}
+        guard let user = user else {
+            return
+        }
         onCollectionTap?(user)
     }
     
@@ -44,7 +48,9 @@ final class UserCardPresenter: UserCardPresenterProtocol {
         view?.showLoading()
         
         usersService.loadUser(id: id) { [weak self] result in
-            guard let self = self else {return}
+            guard let self else {
+                return
+            }
             
             self.view?.hideLoading()
             

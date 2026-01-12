@@ -45,7 +45,9 @@ final class StatisticPresenter: StatisticPresenterProtocol {
         view?.showLoading()
         
         usersService.loadUsers(page: 0, size: 50) { [weak self] result in
-            guard let self = self else { return }
+            guard let self else {
+                return
+            }
             
             self.view?.hideLoading()
             

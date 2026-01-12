@@ -11,7 +11,7 @@ final class TabBarController: UITabBarController {
     }
     
     private func setupTabs() {
-            let catalogVC = CatalogAssembly.assemble()
+            let catalogVC = CatalogAssembly.assembly()
             let catalogNav = UINavigationController(rootViewController: catalogVC)
             
             catalogNav.tabBarItem = UITabBarItem(

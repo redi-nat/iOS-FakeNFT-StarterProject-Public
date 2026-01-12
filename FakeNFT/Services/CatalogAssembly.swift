@@ -1,12 +1,14 @@
 import UIKit
 
 final class CatalogAssembly {
-    static func assemble() -> UIViewController {
+    static func assembly() -> UIViewController {
+        let router = CatalogRouter()
         let service = CatalogService()
         let view = CatalogViewController()
-        let presenter = CatalogPresenter(view: view, service: service)
+        let presenter = CatalogPresenter(view: view, service: service, router: router)
         
-        view.presenter = presenter 
+        view.presenter = presenter
+        router.viewController = view
         
         return view
     }

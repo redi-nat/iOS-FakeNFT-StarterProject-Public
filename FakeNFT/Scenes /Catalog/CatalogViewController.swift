@@ -27,6 +27,7 @@ final class CatalogViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         presenter?.viewDidLoad()
+        navigationItem.backButtonTitle = ""
     }
     
     // MARK: - Setup UI
@@ -102,6 +103,7 @@ extension CatalogViewController: UITableViewDataSource {
 // MARK: - UITableViewDelegate
 extension CatalogViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
         presenter?.didSelectCollection(at: indexPath)
     }
 }

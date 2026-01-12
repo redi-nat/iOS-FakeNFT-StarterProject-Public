@@ -51,6 +51,8 @@
 		DED4D7302EFB05D500009B77 /* CatalogViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED4D72F2EFB05C800009B77 /* CatalogViewController.swift */; };
 		DED4D7322EFB067200009B77 /* CatalogAssembly.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED4D7312EFB067000009B77 /* CatalogAssembly.swift */; };
 		DED4D7342EFB070B00009B77 /* CatalogTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED4D7332EFB070800009B77 /* CatalogTableViewCell.swift */; };
+		DED4D73C2F02D8E100009B77 /* CatalogRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED4D73B2F02D8D800009B77 /* CatalogRouter.swift */; };
+		DED4D7462F0821EA00009B77 /* CollectionDetailAssembly.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED4D7442F0821E900009B77 /* CollectionDetailAssembly.swift */; };
 		E19CD5AB2A98B56600CA39A5 /* NftImageCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E19CD5AA2A98B56600CA39A5 /* NftImageCollectionViewCell.swift */; };
 		E1A1B9DA2AA01CE400C3AFBC /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A1B9D92AA01CE400C3AFBC /* TabBarController.swift */; };
 		E1CD40DC2A96BECC00BE7FE8 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = E1CD40DB2A96BECC00BE7FE8 /* Localizable.strings */; };
@@ -120,6 +122,8 @@
 		DED4D72F2EFB05C800009B77 /* CatalogViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogViewController.swift; sourceTree = "<group>"; };
 		DED4D7312EFB067000009B77 /* CatalogAssembly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogAssembly.swift; sourceTree = "<group>"; };
 		DED4D7332EFB070800009B77 /* CatalogTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogTableViewCell.swift; sourceTree = "<group>"; };
+		DED4D73B2F02D8D800009B77 /* CatalogRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogRouter.swift; sourceTree = "<group>"; };
+		DED4D7442F0821E900009B77 /* CollectionDetailAssembly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionDetailAssembly.swift; sourceTree = "<group>"; };
 		E19CD5AA2A98B56600CA39A5 /* NftImageCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NftImageCollectionViewCell.swift; sourceTree = "<group>"; };
 		E1A1B9D92AA01CE400C3AFBC /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		E1CD40D82A96BE7D00BE7FE8 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Main.strings; sourceTree = "<group>"; };
@@ -129,6 +133,7 @@
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		DED4D71A2EF310D400009B77 /* Docs */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Docs; sourceTree = "<group>"; };
+		DED4D73D2F0821A400009B77 /* CollectionDetails */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = CollectionDetails; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -203,6 +208,7 @@
 				0CFCB7482A7808900009A829 /* TestCatalogController.swift */,
 				DED4D72F2EFB05C800009B77 /* CatalogViewController.swift */,
 				DED4D7332EFB070800009B77 /* CatalogTableViewCell.swift */,
+				DED4D73B2F02D8D800009B77 /* CatalogRouter.swift */,
 				DED4D72D2EFB04EB00009B77 /* CatalogPresenter.swift */,
 			);
 			path = Catalog;
@@ -285,6 +291,7 @@
 				0C79EE6B2A76DE2E00EE90EA /* ServicesAssemly.swift */,
 				558E39E62C68CE0900FB86AC /* NftService.swift */,
 				DED4D7252EFB01BE00009B77 /* CatalogService.swift */,
+				DED4D7442F0821E900009B77 /* CollectionDetailAssembly.swift */,
 				0CFCB73F2A78002A0009A829 /* ExamplePutService.swift */,
 				DED4D7312EFB067000009B77 /* CatalogAssembly.swift */,
 			);
@@ -299,6 +306,7 @@
 				0CFCB7472A7808870009A829 /* Catalog */,
 				0C79EE642A76DDCF00EE90EA /* NftDetails */,
 				3F6806C829CBBC8100B4F915 /* ProductDetails */,
+				DED4D73D2F0821A400009B77 /* CollectionDetails */,
 			);
 			path = "Scenes ";
 			sourceTree = "<group>";
@@ -407,6 +415,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				DED4D71A2EF310D400009B77 /* Docs */,
+				DED4D73D2F0821A400009B77 /* CollectionDetails */,
 			);
 			name = FakeNFT;
 			packageProductDependencies = (
@@ -543,6 +552,7 @@
 				3FC8C39329D246BA0081F015 /* DateFormatters+Presets.swift in Sources */,
 				0CFCB7422A78013E0009A829 /* Nft.swift in Sources */,
 				0CF2C2DD2A783CE600FDC837 /* ErrorView.swift in Sources */,
+				DED4D7462F0821EA00009B77 /* CollectionDetailAssembly.swift in Sources */,
 				0C79EE682A76DE0900EE90EA /* NftDetailPresenter.swift in Sources */,
 				3F68069B29CBBAF100B4F915 /* ProductDetailsTableViewController.swift in Sources */,
 				0CFCB7402A78002A0009A829 /* ExamplePutService.swift in Sources */,
@@ -560,6 +570,7 @@
 				DED4D7302EFB05D500009B77 /* CatalogViewController.swift in Sources */,
 				0CFCB74E2A7817DC0009A829 /* NftStorage.swift in Sources */,
 				3FC8C39129D2453B0081F015 /* ExamplePutRequest.swift in Sources */,
+				DED4D73C2F02D8E100009B77 /* CatalogRouter.swift in Sources */,
 				0CFCB7462A78064B0009A829 /* NftDetailCellModel.swift in Sources */,
 				DED4D72C2EFB048000009B77 /* CatalogProtocols.swift in Sources */,
 				0CFCB74B2A780EA80009A829 /* UIView+Constraints.swift in Sources */,

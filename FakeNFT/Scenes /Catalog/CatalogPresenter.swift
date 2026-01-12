@@ -3,12 +3,14 @@ import Foundation
 final class CatalogPresenter: CatalogPresenterProtocol {
     private weak var view: CatalogViewProtocol?
     private let service: CatalogServiceProtocol
+    private let router: CatalogRouterProtocol
     
     private(set) var collections: [CollectionModel] = []
     
-    init(view: CatalogViewProtocol, service: CatalogServiceProtocol) {
+    init(view: CatalogViewProtocol, service: CatalogServiceProtocol, router: CatalogRouterProtocol) {
         self.view = view
         self.service = service
+        self.router = router
     }
     
     func viewDidLoad() {
@@ -29,5 +31,6 @@ final class CatalogPresenter: CatalogPresenterProtocol {
     
     func didSelectCollection(at indexPath: IndexPath) {
         let selectedCollection = collections[indexPath.row]
+        router.openCollectionDetail(collection: selectedCollection)
     }
 }

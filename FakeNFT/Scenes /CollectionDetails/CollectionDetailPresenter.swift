@@ -54,23 +54,45 @@ final class CollectionDetailPresenter: CollectionDetailPresenterProtocol {
     
     func loadNFTs() {
         let ids = collection.nfts
-        print("📦 Всего ID в коллекции: \(ids.count)")
+        guard !ids.isEmpty else {
+            return
+        }
+        
+        view?.showLoading()
+        
         let group = DispatchGroup()
+        var loadedNfts: [Nft] = []
+        var fetchError: Error?
         
         ids.forEach { id in
             group.enter()
-            service.fetchNFT(id: id) { [weak self] (result: Result<Nft, Error>) in
-                if case .success(let nft) = result {
-                    self?.nfts.append(nft)
+            service.fetchNFT(id: id) { result in
+                defer { group.leave() }
+                
+                switch result {
+                case .success(let nft):
+                    loadedNfts.append(nft)
+                case .failure(let error):
+                    fetchError = error
                 }
-                group.leave()
             }
         }
         
         group.notify(queue: .main) { [weak self] in
-            guard let self = self else { return }
-            print("📊 Итог загрузки: в массиве \(self.nfts.count) объектов")
-            self.view?.reloadData()
+            guard let self else { return }
+            view?.hideLoading()
+            
+            if let error = fetchError {
+                let errorModel = ErrorModel(
+                    message: "Не удалось загрузить часть данных",
+                    actionText: "Повторить",
+                    action: { [weak self] in self?.loadNFTs() }
+                )
+                view?.showError(errorModel)
+            } else {
+                nfts = loadedNfts
+                view?.reloadData()
+            }
         }
     }
     

@@ -14,5 +14,9 @@ protocol CollectionDetailPresenterProtocol: AnyObject {
 protocol CollectionDetailViewProtocol: AnyObject {
     func displayCollectionInfo()
     func reloadData()
+    
+    func showLoading()
+    func hideLoading()
+    func showError(_ model: ErrorModel)
 }
 

@@ -7,6 +7,13 @@ final class CollectionDetailViewController: UIViewController, CollectionDetailVi
     
     private let headerView = CollectionDetailHeaderView()
     
+    private let activityIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.hidesWhenStopped = true
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        return indicator
+    }()
+    
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
@@ -37,6 +44,7 @@ final class CollectionDetailViewController: UIViewController, CollectionDetailVi
     
     private func setupUI() {
         view.addSubview(collectionView)
+        view.addSubview(activityIndicator)
         
         collectionView.addSubview(headerView)
         headerView.translatesAutoresizingMaskIntoConstraints = false
@@ -66,6 +74,39 @@ final class CollectionDetailViewController: UIViewController, CollectionDetailVi
             self.collectionView.reloadData()
         }
     }
+    
+    func showLoading() {
+        DispatchQueue.main.async {
+            self.activityIndicator.startAnimating()
+            self.view.isUserInteractionEnabled = false
+        }
+    }
+
+    func hideLoading() {
+        DispatchQueue.main.async {
+            self.activityIndicator.stopAnimating()
+            self.view.isUserInteractionEnabled = true
+        }
+    }
+
+    func showError(_ model: ErrorModel) {
+        DispatchQueue.main.async {
+            let alert = UIAlertController(
+                title: "Ошибка",
+                message: model.message,
+                preferredStyle: .alert
+            )
+            
+            alert.addAction(UIAlertAction(
+                title: model.actionText,
+                style: .default,
+                handler: { _ in model.action() }
+            ))
+            
+            self.present(alert, animated: true)
+        }
+    }
+
 }
 
 // MARK: - UICollectionViewDataSource

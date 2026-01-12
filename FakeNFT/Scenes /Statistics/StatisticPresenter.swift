@@ -10,6 +10,8 @@ protocol StatisticPresenterProtocol {
     func numberOfUsers() -> Int
     func user(at index: Int) -> User
     func getPlace(for index: Int) -> Int
+    func didPullToRefresh () 
+    
 }
 
 protocol StatisticViewProtocol: AnyObject {
@@ -43,7 +45,9 @@ final class StatisticPresenter: StatisticPresenterProtocol {
         view?.showLoading()
         
         usersService.loadUsers(page: 0, size: 50) { [weak self] result in
-            guard let self = self else { return }
+            guard let self else {
+                return
+            }
             
             self.view?.hideLoading()
             
@@ -63,7 +67,6 @@ final class StatisticPresenter: StatisticPresenterProtocol {
             }
         }
     }
-    
     private func loadSortType() {
         if let savedSortType = UserDefaults.standard.string(forKey: "statisticSortType"),
            let type = SortType(rawValue: savedSortType) {
@@ -85,6 +88,9 @@ final class StatisticPresenter: StatisticPresenterProtocol {
     }
     
     // MARK: - Public Methods
+    func didPullToRefresh() {
+        loadUsers()
+    }
     
     func didSelectSortOption(_ type: SortType) {
         sortType = type

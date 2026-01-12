@@ -3,6 +3,12 @@ import UIKit
 final class StatisticViewController: UIViewController {
     
     // MARK: - UI Components
+    private lazy var refreshControl: UIRefreshControl = {
+        let refresh = UIRefreshControl()
+        refresh.addAction(UIAction { [weak self] _ in self?.refreshData () }, for: .valueChanged)
+        refresh.tintColor = .gray
+        return refresh
+    }()
     
     private lazy var navigationBar: UINavigationBar = {
         let navBar = UINavigationBar()
@@ -49,10 +55,12 @@ final class StatisticViewController: UIViewController {
     }()
     
     // MARK: - Properties
-    private let presenter: StatisticPresenterProtocol
+    private var presenter: StatisticPresenterProtocol
+    private let servicesAssembly:ServicesAssembly?
     
     // MARK: - Initializer
-    init(presenter: StatisticPresenterProtocol) {
+    init(presenter: StatisticPresenterProtocol, servicesAssembly: ServicesAssembly? = nil) {
+        self.servicesAssembly = servicesAssembly
         self.presenter = presenter
         super.init(nibName: nil, bundle: nil)
     }
@@ -66,6 +74,7 @@ final class StatisticViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         presenter.viewDidLoad()
+        navigationItem.backButtonTitle = ""
     }
     
     // MARK: - Setup UI
@@ -91,12 +100,17 @@ final class StatisticViewController: UIViewController {
             activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
+        tableView.refreshControl = refreshControl
     }
     
     // MARK: - Actions
     @objc private func sortButtonTapped() {
         let currentSort = presenter.currentSortType
         showSortOptions(currentSort: currentSort)
+    }
+    
+    private func refreshData() {
+        presenter.didPullToRefresh()
     }
 }
 
@@ -120,7 +134,26 @@ extension StatisticViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        presenter.didSelectUser(at: indexPath.row)
+        
+        let user = presenter.user(at: indexPath.row)
+        print("🎯 Выбран пользователь: \(user.name), ID: \(user.id)")
+        
+        guard let navigationController = self.navigationController else {
+                    print("❌ Нет navigationController!")
+                    return
+                }
+        
+        guard let servicesAssembly = servicesAssembly else {
+            print("⚠️ ServicesAssembly не передан, переход невозможен")
+            presenter.didSelectUser(at: indexPath.row)
+                        return
+                    }
+        print("✅ Есть navigationController и servicesAssembly, создаем UserCardVC...")
+        
+            let userCardAssembly = UserCardAssembly(servicesAssembly: servicesAssembly)
+            let userCardVC = userCardAssembly.assemble(userId: user.id, navigationController: self.navigationController)
+        
+            navigationController.pushViewController(userCardVC, animated: true)
     }
 }
 
@@ -132,6 +165,7 @@ extension StatisticViewController: StatisticViewProtocol {
     
     func hideLoading() {
         activityIndicator.stopAnimating()
+        refreshControl.endRefreshing()
     }
     
     func reloadData() {

@@ -1,0 +1,354 @@
+import UIKit
+import Foundation
+
+/// Экран корзины
+final class CartViewController: UIViewController {
+    
+    // MARK: - Properties
+    
+    private let presenter: CartPresenter
+    private let servicesAssembly: ServicesAssembly
+    private var cartItems: [CartNFTCellModel] = []
+    
+    // MARK: - UI Elements
+    
+    lazy var activityIndicator: UIActivityIndicatorView = {
+        // Используем кастомный LoadingView, но для совместимости с протоколом LoadingView
+        // оставляем UIActivityIndicatorView и управляем им через loadingView
+        let indicator = UIActivityIndicatorView(style: .medium)
+        indicator.hidesWhenStopped = true
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        return indicator
+    }()
+    
+    private lazy var loadingView: CartLoadingView = {
+        let view = CartLoadingView()
+        view.isHidden = true
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    private lazy var tableView: UITableView = {
+        let tableView = UITableView(frame: .zero, style: .plain)
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.separatorStyle = .none
+        tableView.backgroundColor = .systemBackground
+        tableView.register(CartNFTTableViewCell.self)
+        return tableView
+    }()
+    
+    private lazy var summaryView: CartSummaryView = {
+        let view = CartSummaryView()
+        view.onPay = { [weak self] in
+            self?.payButtonTapped()
+        }
+        return view
+    }()
+    
+    private lazy var emptyStateLabel: UILabel = {
+        let label = UILabel()
+        label.text = NSLocalizedString("Cart.empty", comment: "Корзина пуста")
+        label.font = .bodyBold // SF Pro Text, Bold, 17px
+        label.textColor = UIColor(hexString: "#1A1B22")
+        label.textAlignment = .center
+        label.numberOfLines = 1
+        label.isHidden = true
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    // MARK: - Init
+    
+    init(presenter: CartPresenter, servicesAssembly: ServicesAssembly) {
+        self.presenter = presenter
+        self.servicesAssembly = servicesAssembly
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private lazy var sortButton: UIButton = {
+        let button = UIButton(type: .system)
+        // Иконка сортировки/фильтра - используем кастомную иконку из Assets
+        let sortImage = UIImage(named: "filtr")?.withRenderingMode(.alwaysTemplate)
+        button.setImage(sortImage, for: .normal)
+        button.tintColor = .tabBarInactive // Цвет #1A1B22
+        button.addTarget(self, action: #selector(sortButtonTapped), for: .touchUpInside)
+        
+        // Настраиваем imageView для правильного масштабирования
+        button.imageView?.contentMode = .scaleAspectFit
+        
+        // Увеличиваем размер иконки, сохраняя пропорции
+        // Используем imageEdgeInsets для позиционирования и увеличения размера
+        // Увеличиваем размер примерно в 1.5-2 раза для лучшей видимости
+        let scale: CGFloat = 1.8
+        let iconWidth: CGFloat = 21 * scale
+        let iconHeight: CGFloat = 12.6 * scale
+        
+        // Рассчитываем отступы для центрирования увеличенной иконки
+        let horizontalInset = (42 - iconWidth) / 2
+        let verticalInset = (42 - iconHeight) / 2
+        
+        button.imageEdgeInsets = UIEdgeInsets(
+            top: verticalInset,
+            left: horizontalInset,
+            bottom: verticalInset,
+            right: horizontalInset
+        )
+        
+        return button
+    }()
+    
+    // MARK: - Lifecycle
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupNavigationBar()
+        setupUI()
+        view.backgroundColor = .systemBackground
+        
+        // Изначально скрываем все элементы, пока не загрузятся данные
+        tableView.isHidden = true
+        emptyStateLabel.isHidden = true
+        summaryView.isHidden = true
+        // Скрываем кнопку фильтра до начала загрузки
+        navigationItem.rightBarButtonItem = nil
+        
+        presenter.viewDidLoad()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        // Перезагружаем корзину при появлении экрана (например, после возврата из оплаты)
+        presenter.reloadCart()
+    }
+    
+    // MARK: - Private Methods
+    
+    private func setupNavigationBar() {
+        // Убираем заголовок "Корзина" согласно макету
+        title = nil
+        
+        // Настройка Navigation Bar согласно макету
+        // Height: 42, но iOS автоматически управляет высотой Navigation Bar
+        navigationController?.navigationBar.prefersLargeTitles = false
+        
+        // Добавляем кнопку сортировки справа
+        // Размер кнопки: 42x42 согласно макету
+        let sortBarButton = UIBarButtonItem(customView: sortButton)
+        navigationItem.rightBarButtonItem = sortBarButton
+        
+        // Настройка размеров кнопки
+        sortButton.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            sortButton.widthAnchor.constraint(equalToConstant: 42),
+            sortButton.heightAnchor.constraint(equalToConstant: 42)
+        ])
+    }
+    
+    private func setupUI() {
+        // Сначала добавляем все view в иерархию
+        // Важно: loadingView должен быть добавлен последним, чтобы быть поверх всех элементов
+        view.addSubview(tableView)
+        view.addSubview(summaryView)
+        view.addSubview(activityIndicator)
+        view.addSubview(emptyStateLabel)
+        view.addSubview(loadingView) // Добавляем последним, чтобы быть поверх всего
+        
+        // Настраиваем translatesAutoresizingMaskIntoConstraints
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        summaryView.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Теперь создаем все constraints
+        NSLayoutConstraint.activate([
+            // TableView constraints
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            tableView.bottomAnchor.constraint(equalTo: summaryView.topAnchor),
+            
+            // SummaryView constraints
+            summaryView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            summaryView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            summaryView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            summaryView.heightAnchor.constraint(equalToConstant: 76),
+            
+            // ActivityIndicator constraints (скрыт, используется для совместимости с протоколом)
+            activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            
+            // LoadingView constraints - центрирование для адаптации под разные устройства
+            loadingView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            loadingView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            
+            // EmptyStateLabel constraints - центрирование по экрану для адаптации под разные устройства
+            emptyStateLabel.heightAnchor.constraint(equalToConstant: 22),
+            emptyStateLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            emptyStateLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor), // По центру экрана по вертикали
+            emptyStateLabel.leadingAnchor.constraint(greaterThanOrEqualTo: view.leadingAnchor, constant: 16),
+            emptyStateLabel.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -16)
+        ])
+    }
+    
+    @objc
+    private func sortButtonTapped() {
+        let alertController = UIAlertController(
+            title: NSLocalizedString("Cart.Sort.Title", comment: "Сортировка"),
+            message: nil,
+            preferredStyle: .actionSheet
+        )
+        
+        // Добавляем варианты сортировки в нужном порядке: По цене, По рейтингу, По названию
+        let sortOptions: [CartSortOption] = [.price, .rating, .name]
+        for option in sortOptions {
+            let action = UIAlertAction(title: option.displayName, style: .default) { [weak self] _ in
+                self?.presenter.changeSortOption(option)
+            }
+            alertController.addAction(action)
+        }
+        
+        // Добавляем кнопку закрытия отдельно (стиль .cancel - будет отдельно внизу)
+        let closeAction = UIAlertAction(
+            title: NSLocalizedString("Cart.Sort.Cancel", comment: "Закрыть"),
+            style: .cancel
+        )
+        alertController.addAction(closeAction)
+        
+        // Для iPad нужно указать источник для popover
+        if let popover = alertController.popoverPresentationController {
+            popover.sourceView = sortButton
+            popover.sourceRect = sortButton.bounds
+            popover.permittedArrowDirections = .up
+        }
+        
+        present(alertController, animated: true)
+    }
+    
+    private func payButtonTapped() {
+        let orderId = presenter.getOrderId()
+        let nftIds = presenter.getCurrentNFTs().map { $0.id } // Получаем список ID NFT из корзины
+        let currencySelectionAssembly = CurrencySelectionAssembly(servicesAssembly: servicesAssembly)
+        let currencySelectionVC = currencySelectionAssembly.build(orderId: orderId, purchasedNFTIds: nftIds)
+        // Скрываем tab bar на экране оплаты
+        currencySelectionVC.hidesBottomBarWhenPushed = true
+        // Используем push вместо present для отдельного экрана
+        navigationController?.pushViewController(currencySelectionVC, animated: true)
+    }
+}
+
+// MARK: - UITableViewDataSource
+
+extension CartViewController: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        cartItems.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell: CartNFTTableViewCell = tableView.dequeueReusableCell(indexPath: indexPath)
+        let item = cartItems[indexPath.row]
+        cell.configure(with: item)
+        cell.onDelete = { [weak self] in
+            self?.showDeleteConfirmation(for: item)
+        }
+        return cell
+    }
+    
+    private func showDeleteConfirmation(for item: CartNFTCellModel) {
+        let deleteConfirmationVC = DeleteConfirmationViewController(
+            nftModel: item,
+            onConfirm: { [weak self] in
+                self?.presenter.deleteNFT(id: item.id)
+            },
+            onCancel: {
+                // Ничего не делаем при отмене
+            }
+        )
+        present(deleteConfirmationVC, animated: true)
+    }
+}
+
+// MARK: - UITableViewDelegate
+
+extension CartViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        140 // Высота ячейки согласно макету (108 + padding 16*2)
+    }
+}
+
+// MARK: - CartView
+
+extension CartViewController: CartView {
+    func displayNFTs(_ nfts: [CartNFT]) {
+        // Сначала гарантированно скрываем заглушку загрузки синхронно
+        loadingView.stopAnimating()
+        loadingView.isHidden = true
+        // Принудительно обновляем layout, чтобы гарантировать скрытие
+        view.layoutIfNeeded()
+        
+        // Конвертируем CartNFT в CartNFTCellModel
+        cartItems = nfts.map { nft in
+            CartNFTCellModel(
+                id: nft.id,
+                imageURL: nft.images.first, // Берем первое изображение
+                name: nft.name,
+                rating: nft.rating,
+                price: nft.price
+            )
+        }
+        
+        // Показываем/скрываем заглушку и панель оплаты в зависимости от состояния корзины
+        let isEmpty = cartItems.isEmpty
+        emptyStateLabel.isHidden = !isEmpty
+        tableView.isHidden = isEmpty
+        summaryView.isHidden = isEmpty // Показываем панель оплаты только если корзина не пустая
+        
+        // Скрываем/показываем кнопку фильтра в зависимости от состояния корзины
+        if isEmpty {
+            navigationItem.rightBarButtonItem = nil
+        } else {
+            let sortBarButton = UIBarButtonItem(customView: sortButton)
+            navigationItem.rightBarButtonItem = sortBarButton
+        }
+        
+        tableView.reloadData()
+    }
+    
+    func updateSummary(count: Int, total: Double) {
+        summaryView.update(count: count, total: total)
+    }
+}
+
+// MARK: - LoadingView Implementation
+
+extension CartViewController {
+    func showLoading() {
+        // Скрываем все элементы во время загрузки
+        emptyStateLabel.isHidden = true
+        tableView.isHidden = true
+        summaryView.isHidden = true
+        // Скрываем кнопку фильтра во время загрузки
+        navigationItem.rightBarButtonItem = nil
+        // Убеждаемся, что loadingView поверх всего
+        view.bringSubviewToFront(loadingView)
+        // Показываем loadingView
+        loadingView.startAnimating()
+        loadingView.isHidden = false
+    }
+    
+    func hideLoading() {
+        // Скрываем заглушку синхронно, чтобы гарантировать скрытие
+        loadingView.stopAnimating()
+        loadingView.isHidden = true
+        // Принудительно обновляем layout, чтобы гарантировать скрытие
+        view.layoutIfNeeded()
+        // Восстанавливаем кнопку фильтра после загрузки
+        let sortBarButton = UIBarButtonItem(customView: sortButton)
+        navigationItem.rightBarButtonItem = sortBarButton
+        // Панель оплаты будет показана/скрыта в displayNFTs в зависимости от наличия товаров
+    }
+}
+
+

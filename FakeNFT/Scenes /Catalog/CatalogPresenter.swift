@@ -20,11 +20,19 @@ final class CatalogPresenter: CatalogPresenterProtocol {
             self.view?.hideLoading()
             
             switch result {
-            case .success(let collections):
-                self.collections = collections
-                self.view?.reloadTableView()
-            case .failure(let error):
-                print("Error loading: \(error)")
+            case .success(let data):
+                self.collections = data
+                
+                let savedRawValue = UserDefaults.standard.string(forKey: "CatalogSortOrder") ?? ""
+                
+                if let savedSortType = SortType(rawValue: savedRawValue) {
+                    self.applySort(type: savedSortType)
+                } else {
+                    self.view?.reloadTableView()
+                }
+                
+            case .failure:
+                break
             }
         }
     }
@@ -33,4 +41,29 @@ final class CatalogPresenter: CatalogPresenterProtocol {
         let selectedCollection = collections[indexPath.row]
         router.openCollectionDetail(collection: selectedCollection)
     }
+    
+    func sortByName() {
+        applySort(type: .name)
+    }
+
+    func sortByCount() {
+        applySort(type: .count)
+    }
+    
+    private func applySort(type: SortType) {
+        switch type {
+        case .name:
+            collections.sort { $0.name < $1.name }
+        case .count:
+            collections.sort { $0.nfts.count > $1.nfts.count }
+        }
+        
+        UserDefaults.standard.set(type.rawValue, forKey: "CatalogSortOrder")
+        view?.reloadTableView()
+    }
+}
+
+enum SortType: String {
+    case name
+    case count
 }

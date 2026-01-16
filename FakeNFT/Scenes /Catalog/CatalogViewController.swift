@@ -62,7 +62,27 @@ final class CatalogViewController: UIViewController {
     }
     
     @objc private func sortButtonTapped() {
-
+        let alert = UIAlertController(
+            title: "Сортировка",
+            message: nil,
+            preferredStyle: .actionSheet
+        )
+        
+        let sortByNameAction = UIAlertAction(title: "По названию", style: .default) { [weak self] _ in
+            self?.presenter?.sortByName()
+        }
+        
+        let sortByCountAction = UIAlertAction(title: "По количеству NFT", style: .default) { [weak self] _ in
+            self?.presenter?.sortByCount()
+        }
+        
+        let cancelAction = UIAlertAction(title: "Закрыть", style: .cancel)
+        
+        alert.addAction(sortByNameAction)
+        alert.addAction(sortByCountAction)
+        alert.addAction(cancelAction)
+        
+        present(alert, animated: true)
     }
 }
 

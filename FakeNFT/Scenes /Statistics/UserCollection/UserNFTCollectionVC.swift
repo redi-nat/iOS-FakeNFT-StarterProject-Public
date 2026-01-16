@@ -26,6 +26,7 @@ final class UserNFTCollectionVC: UIViewController {
         return indicator
     }()
     
+    private let refreshControl = UIRefreshControl()
     private var presenter: UserNFTCollectionPresenterProtocol
     private var nfts: [UserNFT] = []
     private var likes: [String] = []
@@ -52,6 +53,7 @@ final class UserNFTCollectionVC: UIViewController {
         title = "Коллекция NFT"
         setupNavigationBar()
         setupConstraints()
+        setupRefreshControl()
     }
     
     private func setupNavigationBar() {
@@ -73,6 +75,14 @@ final class UserNFTCollectionVC: UIViewController {
             activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
+    }
+    
+    private func setupRefreshControl() {
+        refreshControl.tintColor = .label
+        collectionView.refreshControl = refreshControl
+        refreshControl.addAction( UIAction { [weak self] _ in
+            self?.presenter.viewDidLoad()
+        }, for: .valueChanged)
     }
 }
 
@@ -101,16 +111,16 @@ extension UserNFTCollectionVC: UICollectionViewDataSource {
 extension UserNFTCollectionVC: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         guard let flowLayout = collectionViewLayout as? UICollectionViewFlowLayout else {
-                    return CGSize(width: 108, height: 192)
-                }
-                
-                let spacing: CGFloat = flowLayout.minimumInteritemSpacing
-                let insets = flowLayout.sectionInset
-                
-                let totalSpacing = insets.left + insets.right + (spacing * 2)
-                let width = (collectionView.frame.width - totalSpacing) / 3
-                
-                return CGSize(width: width, height: width * 1.8)
+            return CGSize(width: 108, height: 192)
+        }
+        
+        let spacing: CGFloat = flowLayout.minimumInteritemSpacing
+        let insets = flowLayout.sectionInset
+        
+        let totalSpacing = insets.left + insets.right + (spacing * 2)
+        let width = (collectionView.frame.width - totalSpacing) / 3
+        
+        return CGSize(width: width, height: width * 1.8)
     }
 }
 
@@ -134,6 +144,7 @@ extension UserNFTCollectionVC: UserNFTCollectionViewProtocol {
     func displayNFTs(_ nfts: [UserNFT]) {
         self.nfts = nfts
         collectionView.reloadData()
+        refreshControl.endRefreshing()
     }
     
     func updateLikes(_ likes: [String]) {
@@ -142,16 +153,19 @@ extension UserNFTCollectionVC: UserNFTCollectionViewProtocol {
     }
     
     func showLoading() {
-        activityIndicator.startAnimating()
+        if !refreshControl.isRefreshing {
+            activityIndicator.startAnimating()
+        }
         view.isUserInteractionEnabled = false
     }
     
     func hideLoading() {
         activityIndicator.stopAnimating()
         view.isUserInteractionEnabled = true
+        refreshControl.endRefreshing()
     }
 }
 
 extension UserNFTCollectionVC: ErrorView {
-   
+    
 }

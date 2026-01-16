@@ -115,6 +115,8 @@ final class UserCardVC: UIViewController {
         setupUI()
         presenter.viewDidLoad(with: userId)
         
+        hidesBottomBarWhenPushed = true
+        
         presenter.onWebsiteTap = { [weak self] url in
             self?.onWebsiteTap?(url)
         }

@@ -121,7 +121,7 @@ extension StatisticViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell: StatisticTableViewCell = tableView.dequeueReusableCell()
+        let cell: StatisticTableViewCell = tableView.dequeueReusableCell(indexPath: indexPath)
         let user = presenter.user(at: indexPath.row)
         let place = presenter.getPlace(for: indexPath.row)
         cell.configure(with: user, place: place)

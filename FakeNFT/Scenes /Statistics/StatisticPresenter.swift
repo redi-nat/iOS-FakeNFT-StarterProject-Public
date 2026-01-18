@@ -58,7 +58,7 @@ final class StatisticPresenter: StatisticPresenterProtocol {
                 self.view?.reloadData()
                 
             case .failure(let error):
-                print("Error loading users: \(error)")
+                AppLogger.error("Error loading users: \(error.localizedDescription)", category: .statistic)
                 let retryAction = { self.loadUsers() }
                 self.view?.showError(
                     message: "Не удалось загрузить пользователей",
@@ -102,8 +102,7 @@ final class StatisticPresenter: StatisticPresenterProtocol {
     func didSelectUser(at index: Int) {
         guard index < users.count else { return }
         let user = users[index]
-        // Здесь будет переход к профилю пользователя
-        print("Selected user: \(user.name)")
+        AppLogger.info("Selected user: \(user.name)")
     }
     
     func numberOfUsers() -> Int {

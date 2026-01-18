@@ -13,6 +13,8 @@ final class UserCardAssembly {
         let presenter = UserCardPresenter(usersService: usersService)
         let viewController = UserCardVC(presenter: presenter, userId: userId)
         
+        viewController.hidesBottomBarWhenPushed = true
+        
         presenter.view = viewController
         
         viewController.onWebsiteTap = { url in
@@ -20,10 +22,14 @@ final class UserCardAssembly {
             navigationController?.pushViewController(webViewController, animated: true)
         }
         
-        viewController.onCollectionTap = { user in
-            // Здесь будет переход к коллекции NFT пользователя
-            print("Переход к коллекции пользователя: \(user.name)")
-        }
-        return viewController
+        viewController.onCollectionTap = { [weak navigationController] user in
+        
+            let collectionAssembly = UserNFTCollectionAssembly(
+                servicesAssembly: self.servicesAssembly
+                        )
+        let collectionVC = collectionAssembly.assemble(nftIds: user.nfts)
+        navigationController?.pushViewController(collectionVC, animated: true)
     }
+    return viewController
+}
 }

@@ -17,7 +17,7 @@ struct UsersRequest: NetworkRequest {
         ]
         
         let url = components?.url
-        print("🌐 URL запроса: \(url?.absoluteString ?? "nil")")
+        AppLogger.debug("🌐 URL запроса: \(url?.absoluteString ?? "nil")", category: .statistic)
         
         return url
     }

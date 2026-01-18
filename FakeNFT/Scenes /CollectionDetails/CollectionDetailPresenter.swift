@@ -5,6 +5,7 @@ final class CollectionDetailPresenter: CollectionDetailPresenterProtocol {
     private weak var view: CollectionDetailViewProtocol?
     private let collection: CollectionModel
     private let service: CatalogService
+    private let cartService: CartService
     private var nfts: [Nft] = []
     
     private let likesKey = "LikedNFTsKey"
@@ -13,10 +14,11 @@ final class CollectionDetailPresenter: CollectionDetailPresenterProtocol {
     private var cartNFTs: Set<String> = []
     private var likedNFTs: Set<String> = []
     
-    init(view: CollectionDetailViewProtocol, collection: CollectionModel, service: CatalogService) {
+    init(view: CollectionDetailViewProtocol, collection: CollectionModel, service: CatalogService, cartService: CartService) {
         self.view = view
         self.collection = collection
         self.service = service
+        self.cartService = cartService
         loadData()
     }
     
@@ -101,13 +103,66 @@ final class CollectionDetailPresenter: CollectionDetailPresenterProtocol {
     }
     
     func toggleCart(nftId: String) {
-        if cartNFTs.contains(nftId) {
-            cartNFTs.remove(nftId)
-        } else {
-            cartNFTs.insert(nftId)
+        view?.showLoading()
+        
+        cartService.loadCart { [weak self] result in
+            guard let self = self else { return }
+            
+            switch result {
+            case .success(let order):
+                var updatedIds = order.nfts
+                
+                if updatedIds.contains(nftId) {
+                    updatedIds.removeAll { $0 == nftId }
+                } else {
+                    updatedIds.append(nftId)
+                }
+                
+                self.cartService.updateOrder(nftIds: updatedIds) { [weak self] updateResult in
+                    DispatchQueue.main.async {
+                        self?.view?.hideLoading()
+                        switch updateResult {
+                        case .success(let newOrder):
+                            self?.cartNFTs = Set(newOrder.nfts)
+                            self?.saveData()
+                            self?.view?.reloadData()
+                        case .failure(let error):
+                            print("Ошибка обновления корзины: \(error)")
+                        }
+                    }
+                }
+                
+            case .failure(let error):
+                self.handleLoadCartError(error, nftId: nftId)
+            }
         }
-        saveData()
-        view?.reloadData()
+    }
+    
+    private func updateServerCart(with ids: [String]) {
+        cartService.updateOrder(nftIds: ids) { [weak self] result in
+            DispatchQueue.main.async {
+                self?.view?.hideLoading()
+                switch result {
+                case .success(let order):
+                    self?.cartNFTs = Set(order.nfts)
+                    self?.saveData()
+                    self?.view?.reloadData()
+                case .failure(let error):
+                    print("Update Error: \(error)")
+                }
+            }
+        }
+    }
+
+    private func handleLoadCartError(_ error: Error, nftId: String) {
+        if let networkError = error as? NetworkClientError,
+           case .httpStatusCode(let code) = networkError, code == 406 {
+            updateServerCart(with: [nftId])
+        } else {
+            DispatchQueue.main.async {
+                self.view?.hideLoading()
+            }
+        }
     }
     
     private func saveData() {

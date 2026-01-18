@@ -27,10 +27,12 @@ struct UpdateCartDto: Dto {
     let nftIds: [String]
     
     func asDictionary() -> [String: String] {
-        // API принимает nfts как строку с ID через запятую
-        // Например: "id1,id2,id3"
-        let nftsString = nftIds.joined(separator: ",")
-        return ["nfts": nftsString]
+        if nftIds.isEmpty {
+            return [:]
+        }
+        
+        let joinedIds = nftIds.joined(separator: "&nfts=")
+        return ["nfts": joinedIds]
     }
 }
 

@@ -73,7 +73,11 @@ final class CartPresenterImpl: CartPresenter {
     
     func deleteNFT(id: String) {
         view?.showLoading()
-        cartService.removeNFT(id: id) { [weak self] result in
+        
+        var newIds = currentNFTs.map { $0.id }
+        newIds.removeAll { $0 == id }
+        
+        cartService.updateOrder(nftIds: newIds) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let order):
@@ -82,8 +86,19 @@ final class CartPresenterImpl: CartPresenter {
                     } else {
                         self?.fetchNFTDetails(ids: order.nfts)
                     }
+                    
                 case .failure(let error):
-                    self?.state = .failed(error)
+                    if let networkError = error as? NetworkClientError,
+                       case .httpStatusCode(let code) = networkError, code == 406 {
+                        if newIds.isEmpty {
+                            self?.currentNFTs = []
+                            self?.state = .empty
+                        } else {
+                            self?.state = .failed(error)
+                        }
+                    } else {
+                        self?.state = .failed(error)
+                    }
                 }
             }
         }
@@ -121,21 +136,25 @@ final class CartPresenterImpl: CartPresenter {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let order):
-                    // Мы получили [String], но в корзине хотим видеть [CartNFT]
-                    // Поэтому запускаем загрузку деталей для каждого ID
                     self?.fetchNFTDetails(ids: order.nfts)
                     
                 case .failure(let error):
-                    self?.state = .failed(error)
+                    if let networkError = error as? NetworkClientError,
+                       case .httpStatusCode(let code) = networkError, code == 406 {
+                        self?.state = .empty
+                    } else {
+                        self?.state = .failed(error)
+                    }
+                    
                 }
             }
         }
     }
-
+    
     private func fetchNFTDetails(ids: [String]) {
         let group = DispatchGroup()
         var loadedNFTs: [CartNFT] = []
-
+        
         for id in ids {
             group.enter()
             cartService.loadNFT(id: id) { result in
@@ -145,9 +164,8 @@ final class CartPresenterImpl: CartPresenter {
                 group.leave()
             }
         }
-
+        
         group.notify(queue: .main) { [weak self] in
-            // ТЕПЕРЬ мы передаем массив CartNFT в состояние экрана
             self?.state = .data(loadedNFTs)
         }
     }

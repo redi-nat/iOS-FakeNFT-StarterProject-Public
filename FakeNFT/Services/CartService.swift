@@ -22,10 +22,15 @@ protocol CartService {
     /// - Parameter completion: Callback с результатом операции
     func clearCart(completion: @escaping CartCompletion)
     
+    func updateOrder(nftIds: [String], completion: @escaping CartCompletion)
     func loadNFT(id: String, completion: @escaping (Result<CartNFT, Error>) -> Void)
 }
 
 final class CartServiceImpl: CartService {
+    func addNFT(id: String, completion: @escaping CartCompletion) {
+        
+    }
+    
     
     private let networkClient: NetworkClient
     
@@ -34,95 +39,24 @@ final class CartServiceImpl: CartService {
     }
     
     func loadCart(completion: @escaping CartCompletion) {
-        let request = GetCartRequest()
-        networkClient.send(request: request, type: Order.self) { result in
-            switch result {
-            case .success(let order):
-                completion(.success(order))
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
+        networkClient.send(request: GetCartRequest(), type: Order.self, completionQueue: .main, onResponse: completion)
+    }
+    
+    func updateOrder(nftIds: [String], completion: @escaping CartCompletion) {
+        let request = UpdateCartRequest(nftIds: nftIds)
+        networkClient.send(request: request, type: Order.self, completionQueue: .main, onResponse: completion)
     }
     
     func removeNFT(id: String, completion: @escaping CartCompletion) {
-        // Сначала загружаем текущую корзину
-        loadCart { [weak self] result in
-            guard let self = self else { return }
-            
-            switch result {
-            case .success(let order):
-                // Удаляем NFT из списка
-                let updatedNftIds = order.nfts.filter { $0 != id }
-                
-                // Отправляем PUT запрос с обновленным списком
-                let request = UpdateCartRequest(nftIds: updatedNftIds)
-                self.networkClient.send(request: request, type: Order.self) { updateResult in
-                    switch updateResult {
-                    case .success(let updatedOrder):
-                        completion(.success(updatedOrder))
-                    case .failure(let error):
-                        completion(.failure(error))
-                    }
-                }
-                
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
-    }
-    
-    func addNFT(id: String, completion: @escaping CartCompletion) {
-        // Сначала загружаем текущую корзину
-        loadCart { [weak self] result in
-            guard let self = self else { return }
-            
-            switch result {
-            case .success(let order):
-                // Проверяем, нет ли уже такого NFT в корзине
-                guard !order.nfts.contains(id) else {
-                    completion(.success(order))
-                    return
-                }
-                
-                // Добавляем новый NFT в список
-                let updatedNftIds = order.nfts + [id]
-                
-                // Отправляем PUT запрос с обновленным списком
-                let request = UpdateCartRequest(nftIds: updatedNftIds)
-                self.networkClient.send(request: request, type: Order.self) { updateResult in
-                    switch updateResult {
-                    case .success(let updatedOrder):
-                        completion(.success(updatedOrder))
-                    case .failure(let error):
-                        completion(.failure(error))
-                    }
-                }
-                
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
     }
     
     func clearCart(completion: @escaping CartCompletion) {
-        // Отправляем PUT запрос с пустым списком NFT
-        let request = UpdateCartRequest(nftIds: [])
-        networkClient.send(request: request, type: Order.self) { result in
-            switch result {
-            case .success(let order):
-                completion(.success(order))
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
+        updateOrder(nftIds: [], completion: completion)
     }
     
     func loadNFT(id: String, completion: @escaping (Result<CartNFT, Error>) -> Void) {
         let request = NFTDetailRequest(id: id)
-        networkClient.send(request: request, type: CartNFT.self, completionQueue: .main) { result in
-            completion(result)
-        }
+        networkClient.send(request: request, type: CartNFT.self, completionQueue: .main, onResponse: completion)
     }
 }
 

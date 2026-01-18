@@ -1,16 +1,17 @@
 import UIKit
 
 final class TabBarController: UITabBarController {
-
+    
     var servicesAssembly: ServicesAssembly!
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setupTabBarAppearance()
         setupViewControllers()
-        
         view.backgroundColor = .systemBackground
+        tabBar.tintColor = UIColor(red: 0.0, green: 0.48, blue: 1.0, alpha: 1.0)
+        tabBar.unselectedItemTintColor = .label
     }
     
     // MARK: - Private Methods
@@ -69,22 +70,31 @@ final class TabBarController: UITabBarController {
         
         // Корзина - используем кастомную иконку из Assets
         // Встраиваем в Navigation Controller для отображения Navigation Bar
+        guard let servicesAssembly = servicesAssembly else {
+            AppLogger.debug("⚠️ servicesAssembly не установлен в TabBarController")
+            return
+        }
         let cartAssembly = CartAssembly(servicesAssembly: servicesAssembly)
         let cartController = cartAssembly.build()
         let cartNavigationController = UINavigationController(rootViewController: cartController)
         // Пробуем загрузить кастомную иконку, если не получается - используем системную
-        let cartImage = UIImage(named: "cartTabBar")?.withRenderingMode(.alwaysTemplate) ?? 
-                        UIImage(systemName: "cart")?.withRenderingMode(.alwaysTemplate)
+        let cartImage = UIImage(named: "cartTabBar")?.withRenderingMode(.alwaysTemplate) ??
+        UIImage(systemName: "cart")?.withRenderingMode(.alwaysTemplate)
         cartNavigationController.tabBarItem = UITabBarItem(
             title: NSLocalizedString("Tab.cart", comment: ""),
             image: cartImage,
             tag: 2
         )
         
-        // Статистика - используем кастомную иконку из Assets
-        let statisticsController = StatisticsViewController()
+        // Статистика - используем компонент из Statistic ветки
+        let statisticAssembly = StatisticAssembly(servicesAssembly: servicesAssembly)
+        let statisticController = statisticAssembly.assemble()
+        let statisticNavController = UINavigationController(rootViewController: statisticController)
+        statisticNavController.navigationBar.prefersLargeTitles = false
+        
+        // Используем кастомную иконку для статистики
         let statisticsImage = UIImage(named: "statisticTabBar")?.withRenderingMode(.alwaysTemplate)
-        statisticsController.tabBarItem = UITabBarItem(
+        statisticNavController.tabBarItem = UITabBarItem(
             title: NSLocalizedString("Tab.statistics", comment: ""),
             image: statisticsImage,
             tag: 3
@@ -94,7 +104,7 @@ final class TabBarController: UITabBarController {
             profileController,
             catalogNavController,
             cartNavigationController,
-            statisticsController
+            statisticNavController
         ]
     }
 }

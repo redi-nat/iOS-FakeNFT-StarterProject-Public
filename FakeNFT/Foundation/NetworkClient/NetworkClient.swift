@@ -39,11 +39,17 @@ extension NetworkClient {
 struct DefaultNetworkClient: NetworkClient {
     private let session: URLSession
     private let decoder: JSONDecoder
+    private let encoder: JSONEncoder
 
     init(session: URLSession = URLSession.shared,
-         decoder: JSONDecoder = JSONDecoder()) {
+         decoder: JSONDecoder = JSONDecoder(),
+         encoder: JSONEncoder = JSONEncoder()) {
         self.session = session
         self.decoder = decoder
+        self.encoder = encoder
+
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        decoder.dateDecodingStrategy = .iso8601
     }
 
     @discardableResult
@@ -110,8 +116,12 @@ struct DefaultNetworkClient: NetworkClient {
     // MARK: - Private
 
     private func create(request: NetworkRequest) -> URLRequest? {
-        guard let endpoint = request.endpoint else { return nil }
 
+        guard let endpoint = request.endpoint else {
+            assertionFailure("Empty endpoint")
+            return nil
+        }
+ 
         var urlRequest = URLRequest(url: endpoint)
         urlRequest.httpMethod = request.httpMethod.rawValue
         urlRequest.addValue(RequestConstants.token, forHTTPHeaderField: "X-Practicum-Mobile-Token")

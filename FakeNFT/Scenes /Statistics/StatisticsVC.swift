@@ -136,24 +136,24 @@ extension StatisticViewController: UITableViewDataSource, UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
         
         let user = presenter.user(at: indexPath.row)
-        print("🎯 Выбран пользователь: \(user.name), ID: \(user.id)")
+        AppLogger.debug("🎯 Выбран пользователь: \(user.name), ID: \(user.id)", category: .statistic)
         
         guard let navigationController = self.navigationController else {
-                    print("❌ Нет navigationController!")
-                    return
-                }
+            AppLogger.error("❌ Нет navigationController!", category: .statistic)
+            return
+        }
         
         guard let servicesAssembly = servicesAssembly else {
-            print("⚠️ ServicesAssembly не передан, переход невозможен")
+            AppLogger.error("⚠️ ServicesAssembly не передан, переход невозможен", category: .statistic)
             presenter.didSelectUser(at: indexPath.row)
-                        return
-                    }
-        print("✅ Есть navigationController и servicesAssembly, создаем UserCardVC...")
+            return
+        }
+        AppLogger.debug("✅ Есть navigationController и servicesAssembly, создаем UserCardVC...", category: .statistic)
         
-            let userCardAssembly = UserCardAssembly(servicesAssembly: servicesAssembly)
-            let userCardVC = userCardAssembly.assemble(userId: user.id, navigationController: self.navigationController)
+        let userCardAssembly = UserCardAssembly(servicesAssembly: servicesAssembly)
+        let userCardVC = userCardAssembly.assemble(userId: user.id, navigationController: self.navigationController)
         
-            navigationController.pushViewController(userCardVC, animated: true)
+        navigationController.pushViewController(userCardVC, animated: true)
     }
 }
 

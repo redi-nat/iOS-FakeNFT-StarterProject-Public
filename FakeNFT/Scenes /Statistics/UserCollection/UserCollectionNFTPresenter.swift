@@ -57,10 +57,10 @@ final class UserNFTCollectionPresenter: UserNFTCollectionPresenterProtocol {
                     switch result {
                     case .success(let nft):
                         loadedNFTs.append(nft)
-                        print("✅ Загружен NFT: \(nft.name)")
+                        AppLogger.info("✅ Загружен NFT: \(nft.name)", category: .statistic)
                     case .failure(let error):
                         errors[nftId] = error
-                        print("❌ Ошибка загрузки NFT \(nftId): \(error)")
+                        AppLogger.error("❌ Ошибка загрузки NFT \(nftId): \(error)", category: .statistic)
                     }
                     group.leave()
                 }
@@ -105,7 +105,7 @@ final class UserNFTCollectionPresenter: UserNFTCollectionPresenterProtocol {
                     self?.likes = likes
                     self?.view?.updateLikes(likes)
                 case .failure(let error):
-                    print("Ошибка загрузки лайков: \(error)")
+                    AppLogger.error("Ошибка загрузки лайков: \(error)", category: .statistic)
                 }
             }
         }
@@ -122,9 +122,9 @@ final class UserNFTCollectionPresenter: UserNFTCollectionPresenterProtocol {
         likesService.updateLikes(likes) { result in
             switch result {
             case .success:
-                print("✅ Лайки обновлены на сервере")
+                AppLogger.info("✅ Лайки обновлены на сервере", category: .statistic)
             case .failure(let error):
-                print("❌ Ошибка обновления лайков: \(error)")
+                AppLogger.error("❌ Ошибка обновления лайков: \(error)", category: .statistic)
             }
         }
     }

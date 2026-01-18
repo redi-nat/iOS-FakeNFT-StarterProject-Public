@@ -1,6 +1,7 @@
 import Foundation
 
 typealias LikesCompletion = (Result<[String], Error>) -> Void
+typealias UPDLikes = (Result<Void,Error>) -> Void
 
 protocol LikesService {
     func loadLikes(completion: @escaping LikesCompletion)
@@ -25,7 +26,8 @@ final class LikesServiceImpl: LikesService {
             }
         }
     }
-    func updateLikes(_ likes: [String], completion: @escaping (Result<Void,Error>) -> Void) {
+    
+    func updateLikes(_ likes: [String], completion: @escaping UPDLikes) {
         let request = LikeRequest(likes: likes)
         networkClient.send(request: request, type: Profile.self) { result in
             switch result {

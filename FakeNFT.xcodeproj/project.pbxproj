@@ -34,6 +34,7 @@
 		2765097E2F177BA000C929AA /* LikesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2765097D2F177B8E00C929AA /* LikesService.swift */; };
 		276509802F1789C900C929AA /* UserNFTRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2765097F2F1789AB00C929AA /* UserNFTRequest.swift */; };
 		276509822F1796B600C929AA /* LikeRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 276509812F1796AA00C929AA /* LikeRequest.swift */; };
+		276509C12F1C096F00C929AA /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 276509C02F1C096700C929AA /* Logger.swift */; };
 		3F478ECF29DB474E00F6D39E /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F478ECE29DB474E00F6D39E /* Colors.swift */; };
 		3F478ED129DB476500F6D39E /* Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F478ED029DB476500F6D39E /* Fonts.swift */; };
 		3F603CCD29DB4A53000C43D7 /* ProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 3F603CCC29DB4A53000C43D7 /* ProgressHUD */; };
@@ -104,6 +105,7 @@
 		2765097D2F177B8E00C929AA /* LikesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikesService.swift; sourceTree = "<group>"; };
 		2765097F2F1789AB00C929AA /* UserNFTRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserNFTRequest.swift; sourceTree = "<group>"; };
 		276509812F1796AA00C929AA /* LikeRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikeRequest.swift; sourceTree = "<group>"; };
+		276509C02F1C096700C929AA /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		3F478ECE29DB474E00F6D39E /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		3F478ED029DB476500F6D39E /* Fonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fonts.swift; sourceTree = "<group>"; };
 		3F68069329CBBAF100B4F915 /* FakeNFT.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FakeNFT.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -181,6 +183,7 @@
 		0CF2C2D92A783C1600FDC837 /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				276509C02F1C096700C929AA /* Logger.swift */,
 				2742B20C2F0E8C7D00E59203 /* WebView */,
 				0CF2C2DF2A784C5600FDC837 /* Views */,
 				0CF2C2DE2A784C4C00FDC837 /* Protocols */,
@@ -583,6 +586,7 @@
 				27473F2B2EFD53D90082D089 /* StatisticsVC.swift in Sources */,
 				0C79EE6C2A76DE2E00EE90EA /* ServicesAssemly.swift in Sources */,
 				0CFCB74E2A7817DC0009A829 /* NftStorage.swift in Sources */,
+				276509C12F1C096F00C929AA /* Logger.swift in Sources */,
 				3FC8C39129D2453B0081F015 /* ExamplePutRequest.swift in Sources */,
 				0CFCB7462A78064B0009A829 /* NftDetailCellModel.swift in Sources */,
 				2742B1F72EFDA86200E59203 /* UsersRequest.swift in Sources */,

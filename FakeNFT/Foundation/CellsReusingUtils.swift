@@ -21,10 +21,10 @@ extension UITableView {
         register(T.self, forCellReuseIdentifier: T.defaultReuseIdentifier)
     }
 
-    func dequeueReusableCell<T: UITableViewCell>() -> T where T: ReuseIdentifying {
-        guard let cell = dequeueReusableCell(withIdentifier: T.defaultReuseIdentifier) as? T else {
-            assertionFailure("Could not dequeue cell with identifier: \(T.defaultReuseIdentifier)")
-            return T()
+    func dequeueReusableCell<T: UITableViewCell>(indexPath: IndexPath) -> T where T: ReuseIdentifying {
+        guard let cell = dequeueReusableCell(withIdentifier: T.defaultReuseIdentifier, for: indexPath) as? T else {
+            assertionFailure("Could not dequeue cell with identifier: \(T.defaultReuseIdentifier) for: \(indexPath)")
+            fatalError("Could not dequeue cell with identifier: \(T.defaultReuseIdentifier)")
         }
         return cell
     }

@@ -4,6 +4,22 @@
 
 [Дизайн Figma](https://www.figma.com/design/Uz5G39wRRCr2mRE4SbnNla/FakeNFT--YP-)
 
+## Демонстрация приложения
+
+### Скринкаст корзина
+
+<video src="screencast/скринкаст корзина.mov" controls width="100%"></video>
+
+Или [скачать видео](screencast/скринкаст%20корзина.mov)
+
+### Скринкаст статистика
+<video src="screencast/Скринкаст_статистика.mov" controls width="100%"></video>
+Или [скачать видео](screencast/Скринкаст_статистика.mov)
+
+### Скринкаст каталог
+<video src="screencast/скринкаст каталог.mov" controls width="100%"></video>
+Или [скачать видео](screencast/скринкаст%20каталог.mov)
+
 ## Назначение и цели приложения
 
 Приложение помогает пользователям просматривать и покупать NFT (Non-Fungible Token). Функционал покупки имитируется с помощью mock-сервера.

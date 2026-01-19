@@ -1,4 +1,4 @@
-import Foundation
+/*import Foundation
 
 enum HttpMethod: String {
     case get = "GET"
@@ -17,4 +17,4 @@ protocol NetworkRequest {
 extension NetworkRequest {
     var parameters: [String: String]? { nil }
     var httpMethod: HttpMethod { .get }
-}
+}*/

@@ -4,6 +4,22 @@ struct ErrorModel {
     let message: String
     let actionText: String
     let action: () -> Void
+    let cancelText: String?
+    let cancelAction: (() -> Void)?
+    
+    init(
+        message: String,
+        actionText: String,
+        action: @escaping () -> Void,
+        cancelText: String? = nil,
+        cancelAction: (() -> Void)? = nil
+    ) {
+        self.message = message
+        self.actionText = actionText
+        self.action = action
+        self.cancelText = cancelText
+        self.cancelAction = cancelAction
+    }
 }
 
 protocol ErrorView {
@@ -13,16 +29,28 @@ protocol ErrorView {
 extension ErrorView where Self: UIViewController {
 
     func showError(_ model: ErrorModel) {
-        let title = NSLocalizedString("Error.title", comment: "")
         let alert = UIAlertController(
-            title: title,
+            title: nil,
             message: model.message,
             preferredStyle: .alert
         )
-        let action = UIAlertAction(title: model.actionText, style: UIAlertAction.Style.default) {_ in
+        
+        // Кнопка отмены (слева) - добавляем первой
+        if let cancelText = model.cancelText {
+            let cancelAction = UIAlertAction(title: cancelText, style: .cancel) { _ in
+                model.cancelAction?()
+            }
+            alert.addAction(cancelAction)
+        }
+        
+        // Кнопка действия (Повторить) - справа
+        // Используем preferredAction для выделения кнопки (она будет визуально выделена)
+        let action = UIAlertAction(title: model.actionText, style: .default) {_ in
             model.action()
         }
         alert.addAction(action)
+        alert.preferredAction = action // Делает кнопку предпочтительной (выделенной)
+        
         present(alert, animated: true)
     }
 }

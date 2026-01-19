@@ -64,4 +64,12 @@ extension UIColor {
         ? .yaBlackDark
         : .yaBlackLight
     }
+    
+    // Tab Bar Colors
+    static let tabBarActive = UIColor(hexString: "0A84FF")
+    static let tabBarInactive = UIColor(hexString: "1A1B22")
+    
+    // Rating Colors
+    static let starActive = UIColor(hexString: "FEEF0D")
+    static let starInactive = UIColor(hexString: "F7F7F8")
 }
